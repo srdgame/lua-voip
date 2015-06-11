@@ -80,13 +80,14 @@ local new_rand do
     new_rand = random.new
   else
     new_rand = function(seed)
+      math.randomseed(seed)
       return math.random
     end
   end
 end
 
-local function GreateRandGenerator(len)
-  local gen = new_rand(os.time())
+local function GreateRandGenerator(len, seed)
+  local gen = new_rand(seed or os.time())
   local function make_rand_sym()
     local i = gen(0,9)
     if i < 5  then

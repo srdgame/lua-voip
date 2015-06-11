@@ -1,0 +1,75 @@
+---
+-- Hepler functions for building message
+--
+
+local sip_msg = require 'voip.sip.message'
+local gen = require 'voip.sip._gen_id'
+
+local function Make200OK(req)
+  local resp = sip_msg.new{
+    "SIP/2.0 200 OK";
+    "Via: "     .. req:getHeader('Via');
+    "From: "    .. req:getHeader('From');
+    "To: "      .. req:getHeader('To');
+    "Call-ID: " .. req:getHeader('Call-ID');
+    "CSeq: "    .. req:getHeader('CSeq');
+    "Expires: " .. (req:getHeader('Expires') or '60');
+    "Content-Length: 0";
+  }
+  return resp
+end
+
+local function Make401Unauthorized(req, realm)
+  assert(realm)
+  local resp = sip_msg.new{
+    "SIP/2.0 401 Unauthorized";
+    "Via: "      .. req:getHeader('Via');
+    "From: "     .. req:getHeader('From');
+    "To: "       .. req:getHeader('To');
+    "Call-ID: "  .. req:getHeader('Call-ID');
+    "CSeq: "     .. req:getHeader('CSeq');
+    'WWW-Authenticate: Digest realm="' .. realm .. '",nonce="' .. gen.nonce() .. '",algorithm=MD5';
+    "Content-Length: 0";
+  }
+  resp:addHeaderValueParameter("To",'tag', gen.tag())
+  return resp
+end
+
+local function Make403Forbidden(req, err)
+  local resp = sip_msg.new{
+    "SIP/2.0 403 Forbidden";
+    "Via: "      .. req:getHeader('Via');
+    "From: "     .. req:getHeader('From');
+    "To: "       .. req:getHeader('To');
+    "Call-ID: "  .. req:getHeader('Call-ID');
+    "CSeq: "     .. req:getHeader('CSeq');
+    "Content-Length: 0";
+  }
+  if err then
+	  --resp:addHeader("Error-Info", err)
+	  resp:setContentBody("text/plain; charset=UTF-8", {"ERROR:", err})
+  end
+  resp:addHeaderValueParameter("To",'tag', gen.tag())
+  return resp
+end
+
+local function ParseUri(uri)
+	if string.lower(uri:sub(1, 4)) == 'sip:' then
+		uri = uri:sub(5)
+	end
+	local id, host = uri:match('^([^@]+)@([^:]+)')
+	local port = uri:match(':([0-9]+)')
+	return id, host, port
+end
+
+return {
+	Make200 = Make200OK,
+	Make200OK = Make200OK,
+	Make401 = Make401Unauthorized,
+	Make401Unauthorized = Make401Unauthorized,
+	Make403 = Make403Forbidden,
+	Make403Forbidden = Make403Forbidden,
+
+	ParseUri = ParseUri,
+}
+
