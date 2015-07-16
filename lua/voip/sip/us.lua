@@ -43,7 +43,7 @@ end
 
 function SIP_US:proxy_clone(req)
 	local msg = req:clone()
-	msg:modifyHeader('Via', "SIP/2.0/UDP "..self.private_.host..":"..self.private_.port..";branch=z9hG4bK".._gen_id.branch())
+	msg:modifyHeader('Via', "SIP/2.0/UDP "..self.private_.host..":"..self.private_.port..";branch=z9hG4bK"..self.private_.gen.branch())
 	return msg
 end
 

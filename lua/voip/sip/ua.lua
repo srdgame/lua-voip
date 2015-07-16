@@ -12,7 +12,7 @@ local SIP_UA do
 SIP_UA = {
   sip_patterns = {
     reg = SipCreateMsg{
-      'REGISTER sip:%{USER}@%{DOMAIN}:%{DOMAIN_PORT} SIP/2.0',
+      'REGISTER sip:%{SRVID}@%{SRVDOMAIN}:%{DOMAIN_PORT} SIP/2.0',
       'Via: SIP/2.0/UDP %{HOST}:%{PORT};branch=z9hG4bK%{BRANCH}',
       'To: <sip:%{USER}@%{DOMAIN}:%{DOMAIN_PORT}>',
       'From: <sip:%{USER}@%{DOMAIN}:%{DOMAIN_PORT}>;tag=%{TAG}',
@@ -36,6 +36,8 @@ SIP_UA = {
       'Date: %{DATE}',
       'Expires: 60',
       'Max-Forwards: 70',
+      'Content-Length: 0',
+      ''
     };
     hb = SipCreateMsg{
       'MESSAGE sip:%{SRVID}@%{SRVDOMAIN} SIP/2.0',
@@ -58,6 +60,20 @@ SIP_UA = {
       '<Status>OK</Status>',
       '</Notify>',
     };
+    invite = SipCreateMsg{
+      'INVITE sip:%{SRVID}@%{SRVDOMAIN} SIP/2.0',
+      'Via: SIP/2.0/UDP %{HOST}:%{PORT};branch=z9hG4bK%{BRANCH}',
+      'To: <sip:%{SRVID}@%{SRVDOMAIN}>',
+      'From: <sip:%{USER}@%{DOMAIN}>;tag=%{TAG}',
+      'Contact: <sip:%{USER}@%{HOST}:%{PORT}>;expires=60',
+      'Call-ID: %{CALLID}@%{HOST}',
+      'CSeq: %{CSEQ} INVITE',
+      'Date: %{DATE}',
+      'Expires: 60',
+      'Max-Forwards: 70',
+      'Content-Length: 0',
+      ''
+    };
   }
 }
 
@@ -66,15 +82,15 @@ SIP_UA = {
 -- @tparam string host localhost ip
 -- @tparam number port local port used for connection
 function SIP_UA:new(host, port, user, domain, srvid, srvdomain)
-  assert(host and port and user and domain and srvid and srvdomain)
+  assert(host and port and user and domain)-- and srvid and srvdomain)
   local t = setmetatable({
     private_ = {
       host = host,
       port = port,
       user = user,
       domain = domain,
-      srvid = srvid,
-      srvdomain = srvdomain,
+      srvid = srvid or '<empty server id>',
+      srvdomain = srvdomain or '<empty server domain>',
       gen = _gen_id;
     }
   },{__index=self})
@@ -120,8 +136,15 @@ function SIP_UA:heart_beat(sn)
   return req
 end
 
-function SIP_UA:message(ctype, body)
+function SIP_UA:message(ctype, body, sid, sdomain)
   local PARAM = self:init_param()
+  if sid then
+	  PARAM.SRVID = sid
+  end
+  if sdomain then
+	  PARAM.SRVDOMAIN = sdomain
+  end
+
   local req = self.sip_patterns.msg:clone()
   req:applyParams(PARAM)
 
@@ -129,6 +152,16 @@ function SIP_UA:message(ctype, body)
 	  req:setContentBody(ctype, body)
   end
 
+  return req
+end
+
+function SIP_UA:invite(ctype, body)
+  local PARAM = self:init_param()
+  local req = self.sip_patterns.invite:clone()
+  req:applyParams(PARAM)
+  if ctype and body then
+	  req:setContentBody(ctype, body)
+  end
   return req
 end
 
