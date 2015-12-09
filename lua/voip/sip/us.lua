@@ -10,7 +10,7 @@ local SIP_US do
 
 SIP_US = {}
 
-function SIP_US:new(host, port)
+function SIP_US:new(host, port, user, domain)
   assert(host and port)
   local t = setmetatable({
     private_ = {
@@ -43,7 +43,20 @@ end
 
 function SIP_US:proxy_clone(req)
 	local msg = req:clone()
+      	--'Via: SIP/2.0/UDP %{HOST}:%{PORT};branch=z9hG4bK%{BRANCH}',
 	msg:modifyHeader('Via', "SIP/2.0/UDP "..self.private_.host..":"..self.private_.port..";branch=z9hG4bK"..self.private_.gen.branch())
+      	--'From: <sip:%{USER}@%{DOMAIN}:%{DOMAIN_PORT}>;tag=%{TAG}',
+	msg:modifyHeader('From', "<sip:"..self.private_.user.."@"..self.private_.domain..":"..self.private_.port..">;tag="..self.private_.gen.tag())
+      	-- 'Call-ID: %{CALLID}@%{HOST}',
+	msg:modifyHeader('Call-ID', self.private_.gen.callid().."@"..self.private_.host)
+	return msg
+end
+
+function SIP_US:proxy_response(resp, req)
+	local msg = resp:clone()
+	msg:modifyHeader('Via', req:getHeader('Via'))
+	msg:modifyHeader('From', req:getHeader('From'))
+	msg:modifyHeader('Call-ID', req:getHeader('Call-ID'))
 	return msg
 end
 
