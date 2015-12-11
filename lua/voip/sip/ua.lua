@@ -74,6 +74,21 @@ SIP_UA = {
       'Content-Length: 0',
       ''
     };
+    info = SipCreateMsg {
+      'INFO sip:%{SRVID}@%{SRVDOMAIN} SIP/2.0',
+      'Via: SIP/2.0/UDP %{HOST}:%{PORT};branch=z9hG4bK%{BRANCH}',
+      'To: <sip:%{SRVID}@%{SRVDOMAIN}>',
+      'From: <sip:%{USER}@%{DOMAIN}>;tag=%{TAG}',
+      'Contact: <sip:%{USER}@%{HOST}:%{PORT}>;expires=60',
+      'Call-ID: %{CALLID}@%{HOST}',
+      'CSeq: %{CSEQ} INFO',
+      'Date: %{DATE}',
+      'Expires: 60',
+      'Max-Forwards: 70',
+      'Content-Type: Application/MANSRTSP',
+      'Content-Length: 0',
+      ''
+    };
   }
 }
 
@@ -158,6 +173,16 @@ end
 function SIP_UA:invite(ctype, body)
   local PARAM = self:init_param()
   local req = self.sip_patterns.invite:clone()
+  req:applyParams(PARAM)
+  if ctype and body then
+	  req:setContentBody(ctype, body)
+  end
+  return req
+end
+
+function SIP_UA:info(ctype, body)
+  local PARAM = self:init_param()
+  local req = self.sip_patterns.info:clone()
   req:applyParams(PARAM)
   if ctype and body then
 	  req:setContentBody(ctype, body)
