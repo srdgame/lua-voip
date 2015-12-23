@@ -191,6 +191,7 @@ function SIP_UA:info(ctype, body)
 end
 
 function SIP_UA:authorize(req, resp, user, pass)
+  local req = req:clone()
   if resp:getResponseCode() ~= 401 then
     return resp
   end
@@ -219,6 +220,7 @@ function SIP_UA:authorize(req, resp, user, pass)
     DIGEST = SipDigest("REGISTER", algo, user or "anonymus", pass  or "", ruri, realm, nonce);
   })
 
+  req:modifyHeader('Via', 'SIP/2.0/UDP '..self.private_.host..':'..self.private_.port..';branch=z9hG4bK'..self.private_.gen.branch())
   req:modifyHeader("CSeq", self.private_.gen.cseq() .. " " .. method)
   req:addHeader("Authorization", auth_header)
 
