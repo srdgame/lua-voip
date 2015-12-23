@@ -99,8 +99,9 @@ local function MakeFromResp(req, resp)
 end
 
 local function MakeACK(req, to_tag)
-  local cseq, method = req:getCSeq()
-  assert(method == 'INVITE')
+  local m, uri, ver = req:getRequestLine()
+  assert(m == 'INVITE')
+  local cseq = req:getCSeq()
   local resp = sip_msg.new{
     "ACK "      .. uri .. " " .. ver;
     "Via: "     .. req:getHeader('Via');
@@ -119,8 +120,9 @@ local function MakeACK(req, to_tag)
 end
 
 local function MakeBYE(req, to_tag)
-  local cseq, method = req:getCSeq()
-  assert(method == 'INVITE')
+  local m, uri, ver = req:getRequestLine()
+  assert(m == 'INVITE')
+  local cseq = req:getCSeq()
   cseq = tostring(tonumber(cseq) + 1)
   local resp = sip_msg.new{
     "BYE "      .. uri .. " " .. ver;
