@@ -130,7 +130,7 @@ local function MakeBYE(req)
     "Max-Forwards: 70";
     "Content-Length: 0";
   }
-  resp:addHeaderValueParameter("To",'tag', gen.tag())
+  --resp:addHeaderValueParameter("To",'tag', gen.tag())
   return resp
 end
 
