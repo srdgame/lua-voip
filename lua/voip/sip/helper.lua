@@ -118,7 +118,7 @@ end
 local function MakeBYE(req)
   local m, uri, ver = req:getRequestLine()
   assert(m == 'INVITE')
-  local cseq = req:getCSeq()
+  local cseq = tostring(tonumber(req:getCSeq()) + 1)
   local resp = sip_msg.new{
     "BYE "      .. uri .. " " .. ver;
     "Via: "     .. req:getHeader('Via');
