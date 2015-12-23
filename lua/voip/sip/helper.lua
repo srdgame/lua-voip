@@ -98,7 +98,7 @@ local function MakeFromResp(req, resp)
   return msg
 end
 
-local function MakeACK(req)
+local function MakeACK(req, to_tag)
   local m, uri, ver = req:getRequestLine()
   assert(m == 'INVITE')
   local cseq = req:getCSeq()
@@ -112,10 +112,14 @@ local function MakeACK(req)
     "Max-Forwards: 70";
     "Content-Length: 0";
   }
+  if to_tag then
+    resp:addHeaderValueParameter("To",'tag', to_tag)
+  end
+  assert(resp:getHeaderValueParameter('To', 'tag'))
   return resp
 end
 
-local function MakeBYE(req)
+local function MakeBYE(req, to_tag)
   local m, uri, ver = req:getRequestLine()
   assert(m == 'INVITE')
   local cseq = req:getCSeq()
@@ -130,7 +134,10 @@ local function MakeBYE(req)
     "Max-Forwards: 70";
     "Content-Length: 0";
   }
-  --resp:addHeaderValueParameter("To",'tag', gen.tag())
+  if to_tag then
+    resp:addHeaderValueParameter("To",'tag', to_tag)
+  end
+  assert(resp:getHeaderValueParameter('To', 'tag'))
   return resp
 end
 
