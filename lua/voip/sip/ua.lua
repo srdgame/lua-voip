@@ -153,12 +153,8 @@ end
 
 function SIP_UA:message(ctype, body, sid, sdomain)
   local PARAM = self:init_param()
-  if sid then
-	  PARAM.SRVID = sid
-  end
-  if sdomain then
-	  PARAM.SRVDOMAIN = sdomain
-  end
+  PARAM.SRVID = sid or PARAM.SRVID
+  PARAM.SRVDOMAIN = sdomain or PARAM.SRVDOMAIN
 
   local req = self.sip_patterns.msg:clone()
   req:applyParams(PARAM)
@@ -170,8 +166,10 @@ function SIP_UA:message(ctype, body, sid, sdomain)
   return req
 end
 
-function SIP_UA:invite(ctype, body)
+function SIP_UA:invite(ctype, body, sid, sdomain)
   local PARAM = self:init_param()
+  PARAM.SRVID = sid or PARAM.SRVID
+  PARAM.SRVDOMAIN = sdomain or PARAM.SRVDOMAIN
   local req = self.sip_patterns.invite:clone()
   req:applyParams(PARAM)
   if ctype and body then
@@ -180,8 +178,10 @@ function SIP_UA:invite(ctype, body)
   return req
 end
 
-function SIP_UA:info(ctype, body)
+function SIP_UA:info(ctype, body, sid, sdomain)
   local PARAM = self:init_param()
+  PARAM.SRVID = sid or PARAM.SRVID
+  PARAM.SRVDOMAIN = sdomain or PARAM.SRVDOMAIN
   local req = self.sip_patterns.info:clone()
   req:applyParams(PARAM)
   if ctype and body then
