@@ -29,6 +29,7 @@ local function Make200OK(req)
     --"Expires: " .. (req:getHeader('Expires') or '60');
     "Content-Length: 0";
   }
+  assert(resp:getHeaderValueParameter('To', 'tag'))
   return resp
 end
 
@@ -44,7 +45,8 @@ local function Make401Unauthorized(req, realm)
     'WWW-Authenticate: Digest realm="' .. realm .. '",nonce="' .. gen.nonce() .. '",algorithm=MD5';
     "Content-Length: 0";
   }
-  resp:addHeaderValueParameter("To",'tag', gen.tag())
+  --resp:addHeaderValueParameter("To",'tag', gen.tag())
+  assert(resp:getHeaderValueParameter('To', 'tag'))
   return resp
 end
 
@@ -62,7 +64,8 @@ local function Make403Forbidden(req, err)
 	  --resp:addHeader("Error-Info", err)
 	  resp:setContentBody("text/plain; charset=UTF-8", {"ERROR:", err})
   end
-  resp:addHeaderValueParameter("To",'tag', gen.tag())
+  --resp:addHeaderValueParameter("To",'tag', gen.tag())
+  assert(resp:getHeaderValueParameter('To', 'tag'))
   return resp
 end
 
@@ -80,7 +83,8 @@ local function Make500InternalError(req, err)
 	  --resp:addHeader("Error-Info", err)
 	  resp:setContentBody("text/plain; charset=UTF-8", {"ERROR:", err})
   end
-  resp:addHeaderValueParameter("To",'tag', gen.tag())
+  --resp:addHeaderValueParameter("To",'tag', gen.tag())
+  assert(resp:getHeaderValueParameter('To', 'tag'))
   return resp
 
 end
