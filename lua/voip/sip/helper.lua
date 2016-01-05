@@ -31,7 +31,7 @@ local function Make200OK(req, host, port)
   }
   assert(resp:getHeaderValueParameter('To', 'tag'))
   if host and port then
-	resp:setHeader('Contact', '<sip:'..host..'@'..port..'>')
+	resp:addHeader('Contact', '<sip:'..host..'@'..port..'>')
   end
   return resp
 end
