@@ -18,7 +18,7 @@ local function Make100Trying(req)
   return resp
 end
 
-local function Make200OK(req)
+local function Make200OK(req, host, port)
   local resp = sip_msg.new{
     "SIP/2.0 200 OK";
     "Via: "     .. req:getHeader('Via');
@@ -30,6 +30,9 @@ local function Make200OK(req)
     "Content-Length: 0";
   }
   assert(resp:getHeaderValueParameter('To', 'tag'))
+  if host and port then
+	resp:setHeader('Contact', '<sip:'..host..'@'..port..'>')
+  end
   return resp
 end
 
