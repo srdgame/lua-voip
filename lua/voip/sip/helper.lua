@@ -64,13 +64,55 @@ local function Make403Forbidden(req, err)
     "Content-Length: 0";
   }
   if err then
-	  --resp:addHeader("Error-Info", err)
 	  resp:setContentBody("text/plain; charset=UTF-8", {"ERROR:", err})
   end
   --resp:addHeaderValueParameter("To",'tag', gen.tag())
   assert(resp:getHeaderValueParameter('To', 'tag'))
   return resp
 end
+
+local function Make488NotAcceptableHere(req, err)
+  assert(req and err)
+  local resp = sip_msg.new{
+    "SIP/2.0 488 Not Acceptable Here";
+    "Via: "      .. req:getHeader('Via');
+    "From: "     .. req:getHeader('From');
+    "To: "       .. req:getHeader('To');
+    "Call-ID: "  .. req:getHeader('Call-ID');
+    "CSeq: "     .. req:getHeader('CSeq');
+    "Content-Length: 0";
+  }
+
+  if err then
+	  resp:setContentBody("text/plain; charset=UTF-8", {"ERROR:", err})
+  end
+  --resp:addHeaderValueParameter("To",'tag', gen.tag())
+  assert(resp:getHeaderValueParameter('To', 'tag'))
+  return resp
+end
+
+local function Make486BusyHere(req, err)
+  assert(req and err)
+  local resp = sip_msg.new{
+    "SIP/2.0 486 Busy Here";
+    "Via: "      .. req:getHeader('Via');
+    "From: "     .. req:getHeader('From');
+    "To: "       .. req:getHeader('To');
+    "Call-ID: "  .. req:getHeader('Call-ID');
+    "CSeq: "     .. req:getHeader('CSeq');
+    "Content-Length: 0";
+  }
+
+  if err then
+	  resp:setContentBody("text/plain; charset=UTF-8", {"ERROR:", err})
+  end
+  --resp:addHeaderValueParameter("To",'tag', gen.tag())
+
+  assert(resp:getHeaderValueParameter('To', 'tag'))
+  return resp
+end
+
+
 
 local function Make500InternalError(req, err)
   local resp = sip_msg.new{
@@ -83,7 +125,6 @@ local function Make500InternalError(req, err)
     "Content-Length: 0";
   }
   if err then
-	  --resp:addHeader("Error-Info", err)
 	  resp:setContentBody("text/plain; charset=UTF-8", {"ERROR:", err})
   end
   --resp:addHeaderValueParameter("To",'tag', gen.tag())
