@@ -189,6 +189,37 @@ local function MakeBYE(req, to_tag)
   return resp
 end
 
+
+local function get_id_host_from_sip(msg)
+	local _, uri = msg:getUri2('From')
+	local id, host, port = helper.ParseUri(uri)
+	return id, host, port
+end
+
+
+local function MakeMSG(msg, ctype, body)
+  local id, host = get_id_host_from_sip(msg)
+  local cseq = msg:getCSeq()
+  cseq = tostring(tonumber(cseq) + 1)
+  local resp = sip_msg.new{
+    "MESSAGE "      .. uri .. " SIP/2.0";
+    "Via: "     .. req:getHeader('Via');
+    "From: "    .. req:getHeader('To'); ---- Tag switch???
+    "To: "      .. req:getHeader('From');
+    "Call-ID: " .. req:getHeader('Call-ID');
+    "CSeq: "    .. cseq .. ' Message';
+    "Max-Forwards: 70";
+    "Content-Length: 0";
+  }
+  assert(resp:getHeaderValueParameter('To', 'tag'))
+
+  if ctype and body then
+	  resp:setContentBody(ctype, body)
+  end
+  return resp
+end
+
+
 local function ParseUri(uri)
 	if string.lower(uri:sub(1, 4)) == 'sip:' then
 		uri = uri:sub(5)
@@ -211,11 +242,19 @@ return {
 	Make403 = Make403Forbidden,
 	Make403Forbidden = Make403Forbidden,
 
+	Make486 = Make486BusyHere,
+	Make486BusyHere = Make486BusyHere,
+
+	Make488 = Make488NotAcceptableHere,
+	Make488NotAcceptableHere = Make488NotAcceptableHere,
+
 	Make500 = Make500InternalError,
 	Make500InternalError = Make500InternalError,
 
 	MakeACK = MakeACK,
 	MakeBYE = MakeBYE,
+	--- This make msg is for message during invite/dialog
+	MakeMSG = MakeMSG,
 
 	MakeFromResp = MakeFromResp,
 
