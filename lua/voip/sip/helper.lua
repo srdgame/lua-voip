@@ -190,9 +190,19 @@ local function MakeBYE(req, to_tag)
 end
 
 
+local function ParseUri(uri)
+	if string.lower(uri:sub(1, 4)) == 'sip:' then
+		uri = uri:sub(5)
+	end
+	local id, host = uri:match('^([^@]+)@([^:]+)')
+	local port = uri:match(':([0-9]+)')
+	return id, host, port
+end
+
+
 local function get_id_host_from_sip(msg)
 	local _, uri = msg:getUri2('From')
-	local id, host, port = helper.ParseUri(uri)
+	local id, host, port = ParseUri(uri)
 	return id, host, port
 end
 
@@ -217,16 +227,6 @@ local function MakeMSG(msg, ctype, body)
 	  resp:setContentBody(ctype, body)
   end
   return resp
-end
-
-
-local function ParseUri(uri)
-	if string.lower(uri:sub(1, 4)) == 'sip:' then
-		uri = uri:sub(5)
-	end
-	local id, host = uri:match('^([^@]+)@([^:]+)')
-	local port = uri:match(':([0-9]+)')
-	return id, host, port
 end
 
 return {
