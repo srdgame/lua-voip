@@ -212,7 +212,7 @@ local function MakeMSG(msg, ctype, body)
   local cseq = msg:getCSeq()
   cseq = tostring(tonumber(cseq) + 1)
   local resp = sip_msg.new{
-    "MESSAGE "      .. uri .. " SIP/2.0";
+    "MESSAGE sip:"  .. id .. '@' .. host .. " SIP/2.0";
     "Via: "     .. req:getHeader('Via');
     "From: "    .. req:getHeader('To'); ---- Tag switch???
     "To: "      .. req:getHeader('From');
