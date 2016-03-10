@@ -189,6 +189,29 @@ local function MakeBYE(req, to_tag)
   return resp
 end
 
+local function MakeNotify(req, host, port, ctype, body)
+  local m, uri, ver = req:getRequestLine()
+  assert(m == 'SUBSCRIBE')
+  local fscheme, furi, fparam = req:getHeaderUri('From')
+  local branch = req:getHeaderValueParameter('Via', 'branch')
+  local cseq = req:getCSeq()
+  local resp = sip_msg.new{
+    "NOTIFY "	.. furi .. " " .. ver;
+    "Via: "	.. req:getHeader('Via'):match('(SIP/.-) .+') .. host .. ':' .. port .. ' branch=' .. branch;
+    "From: "	.. req:getHeader('To');
+    "To: "	.. req:getHeader('From');
+    "Call-ID: "	.. req:getHeader('Call-ID');
+    "CSeq: "	.. cseq .. 'NOTIFY';
+    "Contact: <sip:"	.. host .. ':' .. port .. '>';
+    "Event: Catalog;id=1894";
+    "Subscription-State: active";
+  }
+  if ctype and body then
+	  resp:setContentBody(ctype, body)
+  end
+  return resp
+end
+
 
 local function ParseUri(uri)
 	if string.lower(uri:sub(1, 4)) == 'sip:' then
@@ -255,6 +278,7 @@ return {
 	MakeBYE = MakeBYE,
 	--- This make msg is for message during invite/dialog
 	MakeMSG = MakeMSG,
+	MakeNotify = MakeNotify,
 
 	MakeFromResp = MakeFromResp,
 
