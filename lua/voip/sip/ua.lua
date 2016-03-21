@@ -89,6 +89,21 @@ SIP_UA = {
       'Content-Length: 0',
       ''
     };
+    subscribe = SipCreateMsg {
+      'SUBSCRIBE sip:%{SRVID}@%{SRVDOMAIN} SIP/2.0',
+      'Via: SIP/2.0/UDP %{HOST}:%{PORT};branch=z9hG4bK%{BRANCH}',
+      'To: <sip:%{SRVID}@%{SRVDOMAIN}>',
+      'From: <sip:%{USER}@%{DOMAIN}>;tag=%{TAG}',
+      'Contact: <sip:%{USER}@%{HOST}:%{PORT}>;expires=60',
+      'Call-ID: %{CALLID}@%{HOST}',
+      'CSeq: %{CSEQ} SUBSCRIBE',
+      'Date: %{DATE}',
+      'Expires: 60',
+      'Max-Forwards: 70',
+      'Content-Type: Application/MANSCDP+xml',
+      'Content-Length: 0',
+      ''
+    };
   }
 }
 
@@ -183,6 +198,16 @@ function SIP_UA:info(ctype, body, sid, sdomain)
   PARAM.SRVID = sid or PARAM.SRVID
   PARAM.SRVDOMAIN = sdomain or PARAM.SRVDOMAIN
   local req = self.sip_patterns.info:clone()
+  req:applyParams(PARAM)
+  if ctype and body then
+	  req:setContentBody(ctype, body)
+  end
+  return req
+end
+
+function SIP_UA:subscribe(ctype, body)
+  local PARAM = self:init_param()
+  local req = self.sip_patterns.subscribe:clone()
   req:applyParams(PARAM)
   if ctype and body then
 	  req:setContentBody(ctype, body)
