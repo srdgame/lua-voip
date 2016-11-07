@@ -3,7 +3,8 @@
 --
 
 local sip_msg = require 'voip.sip.message'
-local gen = require 'voip.sip._gen_id'
+local _gen_id = require 'voip.sip._gen_id'
+local gen = _gen_id()
 
 local function Make100Trying(req)
   local resp = sip_msg.new{

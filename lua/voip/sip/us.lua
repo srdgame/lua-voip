@@ -14,7 +14,7 @@ function SIP_US:new(host, port, user, domain)
   assert(host and port)
   local t = setmetatable({
     private_ = {
-      gen = _gen_id;
+      gen = _gen_id();
       host = host;
       port = port;
     }

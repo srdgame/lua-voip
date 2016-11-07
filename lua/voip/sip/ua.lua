@@ -121,7 +121,7 @@ function SIP_UA:new(host, port, user, domain, srvid, srvdomain)
       domain = domain,
       srvid = srvid or '<empty server id>',
       srvdomain = srvdomain or '<empty server domain>',
-      gen = _gen_id;
+      gen = _gen_id();
     }
   },{__index=self})
   return t
