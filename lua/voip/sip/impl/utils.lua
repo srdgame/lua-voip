@@ -59,7 +59,7 @@ local GreateUuidGenerator do
   else
     GreateUuidGenerator = function()
       return function()
-        return uuid.new("default")
+        return uuid.new()
       end
     end
   end
