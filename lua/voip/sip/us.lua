@@ -17,6 +17,8 @@ function SIP_US:new(host, port, user, domain)
       gen = _gen_id();
       host = host;
       port = port;
+      user = user;
+      domain = domain;
     }
   },{__index=self})
   return t
@@ -47,8 +49,15 @@ function SIP_US:proxy_clone(req)
 	msg:modifyHeader('Via', "SIP/2.0/UDP "..self.private_.host..":"..self.private_.port..";branch=z9hG4bK"..self.private_.gen.branch())
       	--'From: <sip:%{USER}@%{DOMAIN}:%{DOMAIN_PORT}>;tag=%{TAG}',
 	msg:modifyHeader('From', "<sip:"..self.private_.user.."@"..self.private_.domain..":"..self.private_.port..">;tag="..self.private_.gen.tag())
+	msg:removeHeaderValue('To', 'tag')
       	-- 'Call-ID: %{CALLID}@%{HOST}',
 	msg:modifyHeader('Call-ID', self.private_.gen.callid().."@"..self.private_.host)
+	-- 'Contact: <sip:%{USER}@%{HOST}:%{PORT}>;expires=60',
+	msg:modifyHeader('Concat', "<sip:"..self.private_.user.."@"..self.private_.host..":"..self.private_.port..">;expires=60")
+	-- msg:modifyHeader('Max-Forwards', tonumber(msg:getHeader('Max-Forwards') - 1))
+	msg:modifyHeader('User-Agent', "LuaSIP")
+	local no, method = req:getCSeq()
+	req:modifyHeader("CSeq", self.private_.gen.cseq() .. " " .. method)
 	return msg
 end
 
