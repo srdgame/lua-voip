@@ -52,7 +52,7 @@ SIP_UA = {
       'Content-Type: Application/MANSCDP+xml',
       'Content-Length: 149',
       '',
-      '<?xml version="1.0"?>',
+      '<?xml version="1.0" encoding="GB2312"?>',
       '<Notify>',
       '<CmdType>Keepalive</CmdType>',
       '<SN>%{SN}</SN>',
